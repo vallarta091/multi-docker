@@ -1,23 +1,20 @@
+--- 
+after_success: 
+  - "docker build -t vallarta091/multi-client ./client"
+  - "docker build -t vallarta091/multi-nginx ./nginx"
+  - "docker build -t vallarta091/multi-server ./server"
+  - "docker build -t vallarta091/multi-worker ./worker"
+  - "echo \"$DOCKER_PASSWORD\" | docker login -u \"$DOCKER_ID\" --password-stdin"
+  - "docker push vallarta091/multi-client"
+  - "docker push vallarta091/multi-nginx"
+  - "docker push vallarta091/multi-server"
+  - "docker push vallarta091/multi-worker"
+before_install: 
+  - "docker build -t vallarta091/react-test -f ./client/Dockerfile.dev ./client"
 language: generic
-sudo: required
-services:
+script: 
+  - "docker run -e CI=true vallarta091/react-test npm test"
+services: 
   - docker
-
- before_install:
-  - docker build -t vallarta091/react-test -f ./client/Dockerfile.dev ./client
-
-script:
-  - docker run -e CI=true vallarta091/react-test npm test
-
-after_success:
-  - docker build -t vallarta091/multi-client ./client
-  - docker build -t vallarta091/multi-nginx ./nginx
-  - docker build -t vallarta091/multi-server ./server
-  - docker build -t vallarta091/multi-worker ./worker
-  # Log in to the docker CLI
-  - echo "$DOCKER_PASSWORD" | docker login -u "$DOCKER_ID" --password-stdin
-  # Take those images and push them to docker hub
-  - docker push vallarta091/multi-client
-  - docker push vallarta091/multi-nginx
-  - docker push vallarta091/multi-server
-  - docker push vallarta091/multi-worker
+sudo: required
+    
